@@ -42,9 +42,9 @@ def step_explore(d):
     """
     x_train, _, y_train, _, _, names = d
     miss = an.missing_ratio(x_train)
-    print(f"NaN globaux : {np.isnan(x_train).mean():.1%} | "
+    print(f"Global NaN : {np.isnan(x_train).mean():.1%} | "
           f"features >80% NaN : {(miss > 0.8).sum()} | "
-          f"features sans NaN : {(miss == 0).sum()}")
+          f"features without NaN : {(miss == 0).sum()}")
     corr = an.target_correlation(x_train, y_train)
     top = np.argsort(-np.abs(corr))[:10]
     print("Top 10 corrélations :", [(str(names[i]), round(float(corr[i]), 3)) for i in top])
