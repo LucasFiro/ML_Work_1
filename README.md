@@ -65,12 +65,13 @@ heart attack (MICHD)** from health and lifestyle features.
 Run Python scripts with argument parsing. 
 
 ### Arguments for `main.py`:
-"finetune", "zero_shot_prediction","both","none", "filter"
-- `none`:
-- `filter`: Filter the data to make it compatible with spotiflow
-- `finetune`: Run the pipeline for finetuning
-- `zero-shot`: Run the pipeline for zero-shot
-- `both`: Run both model and compare them
+"load", "explore","plot","features", "model", "all"
+- `default`: all
+- `load`: Load the dataset
+- `explore`: Perform exploratory data analysis on the training data
+- `plot`: Generate and save visualization for analysis
+- `features`: Perform feature extraction
+- `model`: Run model
 
 
 ---
