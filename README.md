@@ -26,33 +26,42 @@ Optional: verify that required versions are installed
 ---
 
 ## Repository Structure
-
+- `Data/`: Folder for data storage (data needs to be downloaded locally and is ignored by git
+    - `temp`: File present just to create Data folder, useless
 - `Pipeline/`: Code for the training and analysis pipeline
-  - `test.csv`
-  - `temp_notebook.ipynb`:
+  - `Jupyter/`
+    - `Temp_Notebook.ipynb` : Notebook to try things
   - `Python/`
     - `analysis.py`: Metrics computation
     - `load_data.py`: Data loading
     - `main.py`: Script to run the full pipeline
+    - `model.py`: ML model for predictions
     - `plotting.py`: Plot generation
     - `tools.py`: Additional helper
-  - `__pycache__`: contains the cache for the code (not important for the analysis)
+- `.gitignore`: Used to record which folder and file ignore
 - `README.md`: README file
 - `requirements.txt`: Requirements to run the code in this repository
 
 ---
 
-## Data description:
-Heat-shock images in zebrafishes marked with Her1-YFP reporter.
-The images were acquired using the SPIM based microscope Viventis LS1 Live.
-Each embryo is screened at ambient temperature and at heat-shock temperature (40 degrees celcius).
-The data is composed of a csv file containing the x,y and z coordinates and a tiff file containing the 3d image.
+## Data description
 
-## Data Annotation:
-Data annotation was made using FIJI built in multiselection tool. It is however important to filter the data as it also adapt the scale of the FIJI annotation to the real pixel count of the tiff file.
+The data comes from the **BRFSS 2015** (Behavioral Risk Factor Surveillance System), a
+health-related telephone survey run by the CDC on U.S. residents
+([source](https://www.cdc.gov/brfss/annual_data/annual_2015.html)). The task is a binary
+classification: predict whether a person has **coronary heart disease or has had a
+heart attack (MICHD)** from health and lifestyle features.
+
+| File | Content | Shape |
+|---|---|---|
+| `x_train.csv` | Training features (+ `Id` column) | 328,135 × 321 |
+| `y_train.csv` | Training labels, `-1` / `1` in the CSV | 328,135 |
+| `x_test.csv` | Test features (labels hidden, scored on AIcrowd) | 109,379 × 321 |
+| `sample_submission.csv` | Expected submission format | – |
+
 
 ## Usage:
-> ⚠️ **Note**: Be careful with compatibility issue of data with spotiflow.
+> ⚠️ **Note**: Be careful with compatibility issue of data.
 Run Python scripts with argument parsing. 
 
 ### Arguments for `main.py`:
@@ -63,14 +72,11 @@ Run Python scripts with argument parsing.
 - `zero-shot`: Run the pipeline for zero-shot
 - `both`: Run both model and compare them
 
-### Regarding Spotiflow:
-
-Most of the analysis was performed using the code above but modification of the csv file for making them compatible to spotiflow starting with the fiji tools are done using command line
 
 ---
 
-## 👤 Author
+## 👤 Authors
 
 ```text
-Lucas Firouzi
+Célia Budelot, Manon Cesbron Darnaud, Lucas Firouzi
 ```
