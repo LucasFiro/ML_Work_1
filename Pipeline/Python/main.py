@@ -5,7 +5,7 @@ Steps : load | explore | plot | features | model | all   (default : all)
 Examples :
     python3 main.py load
     python3 main.py plot
-    python3 main.py features model
+    python3 main.py features
 """
 import sys
 import numpy as np
@@ -64,7 +64,7 @@ def step_plot(d):
     pl.plot_class_balance(y_train)
     pl.plot_missing(an.missing_ratio(x_train))
     pl.plot_top_correlations(an.target_correlation(x_train, y_train), names)
-    print("Figures sauvegardées dans figures/")
+    print("New figures saved in figures/")
 
 
 def step_features(d):
