@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-DATA_DIR = "../../data"
+DATA_DIR = "Data/dataset/"
 CACHE = os.path.join(DATA_DIR, "cache.npz")
 
 

@@ -1,2 +1,8 @@
 data/
 __pycache__/
+
+# Environnement virtuel
+.venv/
+
+#test random
+test.ipynb
