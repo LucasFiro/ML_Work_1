@@ -5,11 +5,13 @@ def calculate_mse(e):
     """Calculate the mse for vector e."""
     return 1 / 2 * np.mean(e**2)
 
+
 def compute_gradient(y, tx, w):
     """Compute the gradient."""
     err = y - tx.dot(w)
     grad = -tx.T.dot(err) / len(err)
     return grad, err
+
 
 def batch_iter(y, tx, batch_size, num_batches=1):
     """
@@ -24,7 +26,7 @@ def batch_iter(y, tx, batch_size, num_batches=1):
         data_size - max_batches * batch_size
     )  # Points that would be excluded if no overlap is allowed.
 
-        # Generate an array of indexes indicating the start of each batch
+    # Generate an array of indexes indicating the start of each batch
     idxs = np.random.randint(max_batches, size=num_batches) * batch_size
     if remainder != 0:
         # Add an random offset to the start of each batch to eventually consider the remainder points
@@ -39,7 +41,7 @@ def batch_iter(y, tx, batch_size, num_batches=1):
 
 
 def sigmoid(t):
-    return 1.0 / (1 + np.exp(-t))
+    return np.exp(-np.logaddexp(0, -t))
 
 
 def calculate_loss(y, tx, w):
@@ -49,64 +51,63 @@ def calculate_loss(y, tx, w):
 
     pred = sigmoid(tx.dot(w))
     loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
-    return np.squeeze(-loss).item() * (1 / y.shape[0])
+    # return np.squeeze(-loss).item() * (1 / y.shape[0])
+    return -loss / y.shape[0]
 
 
 """Linear regression with gradient descent """
 
+
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Gradient descent algorithm."""
     w = initial_w
-    for n_iter in range(max_iters):
+    for _ in range(max_iters):
         # compute loss, gradient
-        grad, err = compute_gradient(y, tx, w)
-        loss = calculate_mse(err)
+        grad, _ = compute_gradient(y, tx, w)
         # gradient w by descent update
         w = w - gamma * grad
+    loss = calculate_mse(y - tx.dot(w))
 
     return w, loss
 
 
-
 """Linear regression using stochastic gradient descent"""
 
-def mean_squared_error_sgd(y, tx, initial_w, batch_size, max_iters, gamma):
-    """The Stochastic Gradient Descent algorithm (SGD) """
+
+def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
+    """The Stochastic Gradient Descent algorithm (SGD)"""
 
     w = initial_w
 
     for _ in range(max_iters):
 
-        for y_batch, tx_batch in batch_iter(
-            y, tx, batch_size=batch_size, num_batches=1
-        ):
-            # compute gradient 
-            grad, err = compute_gradient(y_batch, tx_batch, w)
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size=1, num_batches=1):
+            # compute gradient
+            grad, _ = compute_gradient(y_batch, tx_batch, w)
 
-            # update w 
+            # update w
             w = w - gamma * grad
-    
-        # calculate loss
-        loss = calculate_mse(err)
 
+        # calculate loss
+    loss = calculate_mse(y - tx.dot(w))
 
     return w, loss
 
 
-
 """Least squares regression using normal equation"""
+
 
 def least_squares(y, tx):
     """Calculate the least squares solution."""
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
-    mse = calculate_mse(y, tx, w)
+    mse = calculate_mse(y - tx.dot(w))
     return w, mse
 
 
-
 """Ridge regression using normal equations"""
+
 
 def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""
@@ -114,36 +115,33 @@ def ridge_regression(y, tx, lambda_):
     a = tx.T.dot(tx) + aI
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
-    mse = calculate_mse(y, tx, w)
+    mse = calculate_mse(y - tx.dot(w))
     return w, mse
 
 
-
-"""Logistic regression using gradient descent (y∈{0,1})"""
-def logistic_regression(y,tx,initial_w, max_iters,gamma):
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """Logistic regression using gradient descent (y∈{0,1})"""
     w = initial_w
     for _ in range(max_iters):
-            # get loss and update w.
-            pred = sigmoid(tx.dot(w))
-            grad = tx.T.dot(pred - y) * (1 / y.shape[0])
-            w -= gamma * grad
+        # get loss and update w.
+        pred = sigmoid(tx.dot(w))
+        grad = tx.T.dot(pred - y) / y.shape[0]
+        w = w - gamma * grad
+    loss = calculate_loss(y, tx, w)
+    return w, loss
 
-    return calculate_loss(y, tx, w), w
 
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """Regularized logistic regression using gradient descent (y∈{0,1},with regularization term λ∥w∥^2)"""
 
-
-"""Regularized logistic regression using gradient descent
-(y∈{0,1},with regularization term λ∥w∥^2)"""
-
-def reg_logistic_regression(y,tx,lambda_, initial_w,max_iters,gamma):
     w = initial_w
 
     # start the logistic regression
-    for iter in range(max_iters):
-        #get gradiente
+    for _ in range(max_iters):
+        # get gradiente
         pred = sigmoid(tx.dot(w))
-        gradient = tx.T.dot(pred - y) * (1 / y.shape[0]) + 2 * lambda_ * w
+        gradient = tx.T.dot(pred - y) / y.shape[0] + 2 * lambda_ * w
         # update w
-        w -= gamma * gradient 
-
-    return calculate_loss(y, tx, w), w
+        w = w - gamma * gradient
+    loss = calculate_loss(y, tx, w)
+    return w, loss

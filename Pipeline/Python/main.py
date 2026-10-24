@@ -7,6 +7,7 @@ Examples :
     python3 main.py plot
     python3 main.py features
 """
+
 import sys
 import numpy as np
 from load_data import load_data
@@ -42,12 +43,17 @@ def step_explore(d):
     """
     x_train, _, y_train, _, _, names = d
     miss = an.missing_ratio(x_train)
-    print(f"Global NaN : {np.isnan(x_train).mean():.1%} | "
-          f"features >80% NaN : {(miss > 0.8).sum()} | "
-          f"features without NaN : {(miss == 0).sum()}")
+    print(
+        f"Global NaN : {np.isnan(x_train).mean():.1%} | "
+        f"features >80% NaN : {(miss > 0.8).sum()} | "
+        f"features without NaN : {(miss == 0).sum()}"
+    )
     corr = an.target_correlation(x_train, y_train)
     top = np.argsort(-np.abs(corr))[:10]
-    print("Top 10 corrélations :", [(str(names[i]), round(float(corr[i]), 3)) for i in top])
+    print(
+        "Top 10 corrélations :",
+        [(str(names[i]), round(float(corr[i]), 3)) for i in top],
+    )
 
 
 def step_plot(d):
@@ -81,7 +87,9 @@ def step_features(d):
     """
     x_train, x_test, _, _, _, names = d
     tx_train, tx_test, fnames = an.preprocess(x_train, x_test, names)
-    print(f"Features : {x_train.shape[1]} -> {tx_train.shape[1]} (biais et indicateurs de NaN inclus)")
+    print(
+        f"Features : {x_train.shape[1]} -> {tx_train.shape[1]} (biais et indicateurs de NaN inclus)"
+    )
     print(f"Train {tx_train.shape} | Test {tx_test.shape}")
     return tx_train, tx_test, fnames
 
@@ -104,12 +112,19 @@ def step_model(d):
         scores = va_x @ w
         th, f1 = best_threshold(va_y, scores)
         acc = accuracy(va_y, (scores >= th).astype(float))
-        print(f"ridge lambda={lambda_:.0e} | seuil={th:.3f} | F1 val={f1:.4f} | acc={acc:.4f}")
+        print(
+            f"ridge lambda={lambda_:.0e} | seuil={th:.3f} | F1 val={f1:.4f} | acc={acc:.4f}"
+        )
     pl.plot_threshold_curve(va_y, va_x @ ridge_fit(tr_y, tr_x, 1e-4), f1_score)
 
 
-STEPS = {"load": step_load, "explore": step_explore, "plot": step_plot,
-         "features": step_features, "model": step_model}
+STEPS = {
+    "load": step_load,
+    "explore": step_explore,
+    "plot": step_plot,
+    "features": step_features,
+    "model": step_model,
+}
 
 
 def main():

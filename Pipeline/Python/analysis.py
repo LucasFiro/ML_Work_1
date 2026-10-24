@@ -9,10 +9,10 @@ def missing_ratio(x):
     """
     Description: Calculate the ratio of missing values (NaN) for each column in the input array.
     ---
-    Input: 
+    Input:
         x (numpy array) - The input array to analyze.
     ---
-    Returns: 
+    Returns:
         A numpy array containing the ratio of missing values for each column.
     """
     return np.isnan(x).mean(axis=0)
@@ -77,8 +77,9 @@ def select_features(x_train, names, max_missing=0.8):
     return np.where(keep)[0]
 
 
-def preprocess(x_train, x_test, names, max_missing=0.8, add_missing_flags=True,
-               min_flag_ratio=0.01):
+def preprocess(
+    x_train, x_test, names, max_missing=0.8, add_missing_flags=True, min_flag_ratio=0.01
+):
     """
     Description: Preprocess the training and testing data by selecting features, adding missing value indicators, imputing missing values with the median, and standardizing the features.
     ---
@@ -96,9 +97,15 @@ def preprocess(x_train, x_test, names, max_missing=0.8, add_missing_flags=True,
     """
     idx = select_features(x_train, names, max_missing)
     ratio = missing_ratio(x_train)[idx]
-    flag_cols = np.where(ratio > min_flag_ratio)[0] if add_missing_flags else np.array([], int)
+    flag_cols = (
+        np.where(ratio > min_flag_ratio)[0] if add_missing_flags else np.array([], int)
+    )
     d = 1 + len(idx) + len(flag_cols)
-    fnames = ["bias"] + [str(names[j]) for j in idx] + [f"{names[idx[j]]}_isnan" for j in flag_cols]
+    fnames = (
+        ["bias"]
+        + [str(names[j]) for j in idx]
+        + [f"{names[idx[j]]}_isnan" for j in flag_cols]
+    )
 
     out = []
     for X in (x_train, x_test):
@@ -121,4 +128,3 @@ def preprocess(x_train, x_test, names, max_missing=0.8, add_missing_flags=True,
         tx_tr[:, c] = np.isnan(x_train[:, idx[jj]])
         tx_te[:, c] = np.isnan(x_test[:, idx[jj]])
     return tx_tr, tx_te, fnames
-

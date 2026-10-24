@@ -141,4 +141,3 @@ def best_threshold(y_true, scores, n_grid=200):
     f1s = [f1_score(y_true, (scores >= t).astype(float)) for t in ths]
     i = int(np.argmax(f1s))
     return ths[i], f1s[i]
-

@@ -1,7 +1,8 @@
 import os
 import numpy as np
 import matplotlib
-matplotlib.use("Agg") #Permits to not display the plots while the code is running
+
+matplotlib.use("Agg")  # Permits to not display the plots while the code is running
 import matplotlib.pyplot as plt
 
 FIG_DIR = "figures"
@@ -76,8 +77,11 @@ def plot_top_correlations(corr, names, k=20):
     """
     order = np.argsort(-np.abs(corr))[:k][::-1]
     fig, ax = plt.subplots(figsize=(6, 5))
-    ax.barh([names[i] for i in order], corr[order],
-            color=["tab:red" if corr[i] > 0 else "tab:blue" for i in order])
+    ax.barh(
+        [names[i] for i in order],
+        corr[order],
+        color=["tab:red" if corr[i] > 0 else "tab:blue" for i in order],
+    )
     ax.set_xlabel("Corrélation avec _MICHD")
     ax.set_title(f"Top {k} features corrélées à la cible")
     _save(fig, "top_correlations.png")
@@ -103,4 +107,3 @@ def plot_threshold_curve(y_true, scores, f1_fn):
     ax.set_ylabel("F1 (validation)")
     ax.set_title("F1 en fonction du seuil")
     _save(fig, "f1_vs_threshold.png")
-

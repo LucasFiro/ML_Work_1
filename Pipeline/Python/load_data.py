@@ -9,11 +9,11 @@ def _read_matrix(path, chunk=20000):
     """
     Description: Read a csv file in chunks to save memory. The empty strings are converted to NaN.
     ---
-    Input: 
+    Input:
         path (str) - The path to the CSV file.
         chunk (int) - The number of rows to read at a time.
     ---
-    Returns: 
+    Returns:
         A numpy array containing the data from the CSV file.
     """
     blocks = []
@@ -47,11 +47,17 @@ def load_csv_data(data_dir=DATA_DIR):
     feature_names = np.array(header[1:])  # Remove ID column
 
     # y_train contains -1 and 1 and -1 are converted to 0
-    y = np.genfromtxt(os.path.join(data_dir, "y_train.csv"),
-                      delimiter=",", skip_header=1, usecols=1)
+    y = np.genfromtxt(
+        os.path.join(data_dir, "y_train.csv"), delimiter=",", skip_header=1, usecols=1
+    )
     y = (y == 1).astype(float)
-    train_ids = np.genfromtxt(os.path.join(data_dir, "y_train.csv"),
-                              delimiter=",", skip_header=1, usecols=0, dtype=int)
+    train_ids = np.genfromtxt(
+        os.path.join(data_dir, "y_train.csv"),
+        delimiter=",",
+        skip_header=1,
+        usecols=0,
+        dtype=int,
+    )
 
     x_tr = _read_matrix(os.path.join(data_dir, "x_train.csv"))
     x_te = _read_matrix(os.path.join(data_dir, "x_test.csv"))
@@ -77,10 +83,15 @@ def load_data(use_cache=True, data_dir=DATA_DIR):
     cache = os.path.join(data_dir, "cache.npz")
     if use_cache and os.path.exists(cache):
         d = np.load(cache, allow_pickle=False)
-        return (d["x_train"], d["x_test"], d["y_train"],
-                d["train_ids"], d["test_ids"], d["feature_names"])
+        return (
+            d["x_train"],
+            d["x_test"],
+            d["y_train"],
+            d["train_ids"],
+            d["test_ids"],
+            d["feature_names"],
+        )
     out = load_csv_data(data_dir)
     names = ("x_train", "x_test", "y_train", "train_ids", "test_ids", "feature_names")
     np.savez_compressed(cache, **dict(zip(names, out)))
     return out
-
