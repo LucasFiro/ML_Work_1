@@ -1,16 +1,18 @@
-
-
 import implementations as imp
 import numpy as np
 
+
 def compare_models(
-    y_train, tx_train, y_test, tx_test,
+    y_train,
+    tx_train,
+    y_test,
+    tx_test,
     max_iters=1000,
     gamma=0.01,
     lambda_l2=0.01,
     lambda_l1=0.01,
     k=5,
-    threshold=0.5
+    threshold=0.5,
 ):
     """
     Train and compare:
@@ -46,8 +48,7 @@ def compare_models(
 
     # 1. Logistic Regression
     w_log, loss_log = imp.logistic_regression(
-        y_train, tx_train, initial_w.copy(),
-        max_iters, gamma
+        y_train, tx_train, initial_w.copy(), max_iters, gamma
     )
     predictions["Logistic Regression"] = (
         imp.sigmoid(tx_test.dot(w_log)) >= threshold
@@ -55,8 +56,7 @@ def compare_models(
 
     # 2. Logistic Regression L2
     w_l2, loss_l2 = imp.reg_logistic_regression(
-        y_train, tx_train, lambda_l2,
-        initial_w.copy(), max_iters, gamma
+        y_train, tx_train, lambda_l2, initial_w.copy(), max_iters, gamma
     )
     predictions["Logistic Regression L2"] = (
         imp.sigmoid(tx_test.dot(w_l2)) >= threshold
@@ -64,28 +64,23 @@ def compare_models(
 
     # 3. Logistic Regression L1
     loss_l1, w_l1 = imp.logistic_regression_l1(
-        y_train, tx_train, initial_w.copy(),
-        max_iters, gamma, lambda_l1
+        y_train, tx_train, initial_w.copy(), max_iters, gamma, lambda_l1
     )
     predictions["Logistic Regression L1"] = (
         imp.sigmoid(tx_test.dot(w_l1)) >= threshold
     ).astype(int)
 
     # 4. KNN
-    predictions["KNN"] = imp.knn_predict(
-        tx_train, y_train, tx_test, k=k
-    )
+    predictions["KNN"] = imp.knn_predict(tx_train, y_train, tx_test, k=k)
 
     # 5. Gaussian Naive Bayes
     nb_model = imp.gaussian_naive_bayes(y_train, tx_train)
-    predictions["Gaussian Naive Bayes"] = (
-        imp.gaussian_naive_bayes_predict(nb_model, tx_test)
+    predictions["Gaussian Naive Bayes"] = imp.gaussian_naive_bayes_predict(
+        nb_model, tx_test
     )
 
     # 6. Baseline: always predict 0
-    predictions["Baseline (all zeros)"] = np.zeros(
-        len(y_test), dtype=int
-    )
+    predictions["Baseline (all zeros)"] = np.zeros(len(y_test), dtype=int)
 
     def compute_metrics(y_true, y_pred):
         tp = np.sum((y_true == 1) & (y_pred == 1))
@@ -99,7 +94,8 @@ def compare_models(
         specificity = tn / (tn + fp) if tn + fp > 0 else 0.0
         f1 = (
             2 * precision * recall / (precision + recall)
-            if precision + recall > 0 else 0.0
+            if precision + recall > 0
+            else 0.0
         )
         balanced_accuracy = (recall + specificity) / 2
 
@@ -113,7 +109,7 @@ def compare_models(
             "TP": int(tp),
             "TN": int(tn),
             "FP": int(fp),
-            "FN": int(fn)
+            "FN": int(fn),
         }
 
     results = {}
@@ -123,23 +119,21 @@ def compare_models(
 
     # Display results
     metric_names = [
-        "accuracy", "precision", "recall",
-        "specificity", "F1", "balanced_accuracy"
+        "accuracy",
+        "precision",
+        "recall",
+        "specificity",
+        "F1",
+        "balanced_accuracy",
     ]
 
     print("\nMODEL COMPARISON")
     print("-" * 100)
-    print(
-        f"{'Model':30s}"
-        + "".join(f"{m:>13s}" for m in metric_names)
-    )
+    print(f"{'Model':30s}" + "".join(f"{m:>13s}" for m in metric_names))
     print("-" * 100)
 
     for name, metrics in results.items():
-        print(
-            f"{name:30s}"
-            + "".join(f"{metrics[m]:13.4f}" for m in metric_names)
-        )
+        print(f"{name:30s}" + "".join(f"{metrics[m]:13.4f}" for m in metric_names))
 
     print("\nCONFUSION COUNTS")
     print("-" * 60)

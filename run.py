@@ -14,6 +14,7 @@ from tools import accuracy, best_threshold, ridge_fit, train_val_split
 
 LAMBDA = 1e-6  # ridge regularization strength
 SEED = 0  # seed of the train/validation split, for reproducibility
+CLEAN_CODES = True
 OUTPUT = "submission.csv"
 
 
@@ -26,6 +27,8 @@ def main():
     print(f"Loaded x_train {x_train.shape}, x_test {x_test.shape}")
 
     # 2. Preprocess train and test with statistics computed on train only
+    if CLEAN_CODES:
+        x_train, x_test = an.clean_special_codes(x_train, x_test)
     tx_train, tx_test, _ = an.preprocess(x_train, x_test, names)
 
     # 3. Threshold selection on a held-out validation split

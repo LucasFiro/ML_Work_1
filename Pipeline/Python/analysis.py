@@ -57,6 +57,36 @@ def target_correlation(x, y):
     return corr
 
 
+# -------------- Data cleaning --------------
+def clean_special_codes(x_train, x_test):
+    """
+    Replace the BRFSS special answer codes by meaningful values.
+    """
+    x_train, x_test = x_train.copy(), x_test.copy()
+    for j in range(x_train.shape[1]):
+        col = x_train[:, j]
+        values = np.unique(col[~np.isnan(col)])
+        if len(values) == 0 or not np.all(values == np.round(values)):
+            continue  # empty or continuous column
+        values = set(values.astype(int))
+        to_nan, to_zero = [], False
+        if max(values) <= 9:
+            if 9 in values:
+                to_nan.append(9)
+            if 7 in values and 6 not in values and 8 not in values:
+                to_nan.append(7)
+        elif max(values) <= 99 and (77 in values or 99 in values):
+            if any(31 <= v <= 76 for v in values):
+                continue  # 77 may be a real value (e.g. an age)
+            to_nan += [77, 99]
+            to_zero = True
+        for X in (x_train, x_test):
+            X[np.isin(X[:, j], to_nan), j] = np.nan
+            if to_zero:
+                X[X[:, j] == 88, j] = 0
+    return x_train, x_test
+
+
 # # -------------- Feature extraction --------------
 def select_features(x_train, names, max_missing=0.8):
     """

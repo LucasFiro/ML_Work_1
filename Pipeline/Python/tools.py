@@ -68,8 +68,9 @@ def ridge_fit(y, tx, lambda_):
     """
     reg = lambda_ * len(y) * np.eye(tx.shape[1])
     reg[0, 0] = 0.0
-    gram = (tx.T @ tx).astype(np.float64)  # (D, D), petit
-    return np.linalg.solve(gram + reg, (tx.T @ y).astype(np.float64))
+    tx = tx.astype(np.float64)  # float64 for a numerically accurate Gram matrix
+    gram = tx.T @ tx  # (D, D), small
+    return np.linalg.solve(gram + reg, tx.T @ y)
 
 
 def confusion(y_true, y_pred):
