@@ -1,15 +1,16 @@
 import numpy as np
 
+
 ## utils
 def calculate_mse(e):
     """Description: Calculate the mse for vector e.
     ---
-    Input: 
-        e (array) - Difference between actual value and predictoion (e = y - tx.dot(w)) 
+    Input:
+        e (array) - Difference between actual value and predictoion (e = y - tx.dot(w))
     ---
     Return:
         Scalar with the MSE loss value"""
-    
+
     return 1 / 2 * np.mean(e**2)
 
 
@@ -60,7 +61,6 @@ def calculate_loss(y, tx, w):
     loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
     # return np.squeeze(-loss).item() * (1 / y.shape[0])
     return -loss / y.shape[0]
-
 
 
 ### asked models
@@ -157,10 +157,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     return w, loss
 
 
-
 ### additional models
-
-
 
 
 def logistic_regression_l1(y, tx, initial_w, max_iters, gamma, lambda_):
@@ -197,8 +194,8 @@ def logistic_regression_l1(y, tx, initial_w, max_iters, gamma, lambda_):
     eps = 1e-15
     pred = np.clip(sigmoid(tx.dot(w)), eps, 1 - eps)
 
-    loss = calculate_loss(y,tx,w)
-    #loss += lambda_ * np.sum(np.abs(w))
+    loss = calculate_loss(y, tx, w)
+    # loss += lambda_ * np.sum(np.abs(w))
     return loss, w
 
 
@@ -222,7 +219,7 @@ def knn_predict(tx_train, y_train, tx_test, k=5, batch_size=128):
     k = min(k, len(y_train))
 
     # Squared norms of training samples
-    train_norms = np.sum(tx_train ** 2, axis=1)
+    train_norms = np.sum(tx_train**2, axis=1)
 
     for start in range(0, len(tx_test), batch_size):
         end = min(start + batch_size, len(tx_test))
@@ -231,7 +228,7 @@ def knn_predict(tx_train, y_train, tx_test, k=5, batch_size=128):
         # Squared Euclidean distances:
         # ||x - z||² = ||x||² + ||z||² - 2*x.z
         distances = (
-            np.sum(X_batch ** 2, axis=1)[:, None]
+            np.sum(X_batch**2, axis=1)[:, None]
             + train_norms[None, :]
             - 2 * X_batch @ tx_train.T
         )
@@ -239,17 +236,12 @@ def knn_predict(tx_train, y_train, tx_test, k=5, batch_size=128):
         # Numerical errors can produce tiny negative distances
         np.maximum(distances, 0, out=distances)
 
-        neighbors = np.argpartition(
-            distances, kth=k - 1, axis=1
-        )[:, :k]
+        neighbors = np.argpartition(distances, kth=k - 1, axis=1)[:, :k]
 
         votes = np.mean(y_train[neighbors], axis=1)
         predictions[start:end] = (votes >= 0.5).astype(int)
 
     return predictions
-
-
-
 
 
 def gaussian_naive_bayes(y, tx, eps=1e-9):
@@ -280,11 +272,7 @@ def gaussian_naive_bayes(y, tx, eps=1e-9):
         means[c] = np.mean(X_c, axis=0)
         variances[c] = np.maximum(np.var(X_c, axis=0), eps)
 
-    return {
-        "priors": priors,
-        "means": means,
-        "variances": variances
-    }
+    return {"priors": priors, "means": means, "variances": variances}
 
 
 def gaussian_naive_bayes_predict(model, tx):
@@ -306,9 +294,8 @@ def gaussian_naive_bayes_predict(model, tx):
 
         # Log Gaussian likelihood, summed over features
         log_probs[:, c] += -0.5 * np.sum(
-            np.log(2 * np.pi * variances[c])
-            + ((tx - means[c]) ** 2) / variances[c],
-            axis=1
+            np.log(2 * np.pi * variances[c]) + ((tx - means[c]) ** 2) / variances[c],
+            axis=1,
         )
 
     return np.argmax(log_probs, axis=1)
