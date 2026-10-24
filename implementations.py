@@ -1,8 +1,15 @@
 import numpy as np
 
-
+## utils
 def calculate_mse(e):
-    """Calculate the mse for vector e."""
+    """Description: Calculate the mse for vector e.
+    ---
+    Input: 
+        e (array) - Difference between actual value and predictoion (e = y - tx.dot(w)) 
+    ---
+    Return:
+        Scalar with the MSE loss value"""
+    
     return 1 / 2 * np.mean(e**2)
 
 
@@ -54,6 +61,9 @@ def calculate_loss(y, tx, w):
     # return np.squeeze(-loss).item() * (1 / y.shape[0])
     return -loss / y.shape[0]
 
+
+
+### asked models
 
 """Linear regression with gradient descent """
 
@@ -145,3 +155,160 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         w = w - gamma * gradient
     loss = calculate_loss(y, tx, w)
     return w, loss
+
+
+
+### additional models
+
+
+
+
+def logistic_regression_l1(y, tx, initial_w, max_iters, gamma, lambda_):
+    """
+    Logistic regression with L1 regularization using gradient descent.
+
+    Args:
+        y: labels (N,)
+        tx: features matrix (N, D)
+        initial_w: initial weights (D,)
+        max_iters: number of iterations
+        gamma: learning rate
+        lambda_: L1 regularization strength
+
+    Returns:
+        loss: final regularized loss
+        w: learned weights
+    """
+    w = initial_w
+    N = y.shape[0]
+
+    for _ in range(max_iters):
+        pred = sigmoid(tx.dot(w))
+
+        # Gradient of logistic loss
+        grad = tx.T.dot(pred - y) / N
+
+        # Subgradient of L1 penalty
+        grad += lambda_ * np.sign(w)
+
+        w -= gamma * grad
+
+    # Logistic loss + L1 penalty
+    eps = 1e-15
+    pred = np.clip(sigmoid(tx.dot(w)), eps, 1 - eps)
+
+    loss = calculate_loss(y,tx,w)
+    #loss += lambda_ * np.sum(np.abs(w))
+    return loss, w
+
+
+def knn_train(y, tx):
+    """
+    KNN training: store the training data.
+
+    Returns:
+        model: tuple containing training features and labels
+    """
+    return tx.copy(), y.copy()
+
+
+def knn_predict(tx_train, y_train, tx_test, k=5, batch_size=128):
+    """
+    KNN prediction using vectorized NumPy operations.
+
+    batch_size controls memory usage.
+    """
+    predictions = np.zeros(tx_test.shape[0], dtype=int)
+    k = min(k, len(y_train))
+
+    # Squared norms of training samples
+    train_norms = np.sum(tx_train ** 2, axis=1)
+
+    for start in range(0, len(tx_test), batch_size):
+        end = min(start + batch_size, len(tx_test))
+        X_batch = tx_test[start:end]
+
+        # Squared Euclidean distances:
+        # ||x - z||² = ||x||² + ||z||² - 2*x.z
+        distances = (
+            np.sum(X_batch ** 2, axis=1)[:, None]
+            + train_norms[None, :]
+            - 2 * X_batch @ tx_train.T
+        )
+
+        # Numerical errors can produce tiny negative distances
+        np.maximum(distances, 0, out=distances)
+
+        neighbors = np.argpartition(
+            distances, kth=k - 1, axis=1
+        )[:, :k]
+
+        votes = np.mean(y_train[neighbors], axis=1)
+        predictions[start:end] = (votes >= 0.5).astype(int)
+
+    return predictions
+
+
+
+
+
+def gaussian_naive_bayes(y, tx, eps=1e-9):
+    """
+    Train Gaussian Naive Bayes for binary classification.
+
+    Args:
+        y: labels (N,), values 0 or 1
+        tx: features matrix (N, D)
+        eps: minimum variance for numerical stability
+
+    Returns:
+        model: dictionary containing class priors, means and variances
+    """
+    classes = np.array([0, 1])
+
+    priors = np.zeros(2)
+    means = np.zeros((2, tx.shape[1]))
+    variances = np.zeros((2, tx.shape[1]))
+
+    for c in classes:
+        X_c = tx[y == c]
+
+        if len(X_c) == 0:
+            raise ValueError(f"No training samples for class {c}")
+
+        priors[c] = len(X_c) / len(y)
+        means[c] = np.mean(X_c, axis=0)
+        variances[c] = np.maximum(np.var(X_c, axis=0), eps)
+
+    return {
+        "priors": priors,
+        "means": means,
+        "variances": variances
+    }
+
+
+def gaussian_naive_bayes_predict(model, tx):
+    """
+    Predict binary labels using Gaussian Naive Bayes.
+
+    Returns:
+        predictions: predicted labels (N,)
+    """
+    priors = model["priors"]
+    means = model["means"]
+    variances = model["variances"]
+
+    log_probs = np.zeros((tx.shape[0], 2))
+
+    for c in [0, 1]:
+        # Log prior
+        log_probs[:, c] = np.log(priors[c])
+
+        # Log Gaussian likelihood, summed over features
+        log_probs[:, c] += -0.5 * np.sum(
+            np.log(2 * np.pi * variances[c])
+            + ((tx - means[c]) ** 2) / variances[c],
+            axis=1
+        )
+
+    return np.argmax(log_probs, axis=1)
