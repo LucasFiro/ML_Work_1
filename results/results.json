@@ -1,0 +1,254 @@
+{
+  "setup": {
+    "seed": 0,
+    "val_ratio": 0.2,
+    "clean_special_codes": true,
+    "tune_hyperparams": true,
+    "threshold_grid": [
+      0.05,
+      0.95,
+      0.0049999999999999975
+    ],
+    "gamma": 0.5,
+    "max_iters": 1000,
+    "knn_max_train": 50000,
+    "n_features_after_preprocessing": 330,
+    "n_train_total": 328135,
+    "n_train_split": 262508,
+    "n_validation": 65627,
+    "positive_rate_train": 0.08830207079403295,
+    "positive_rate_validation": 0.08837825894829872
+  },
+  "results": [
+    {
+      "model": "logreg",
+      "label": "Logistic regr. (no reg.)",
+      "best_params": {},
+      "threshold": 0.195,
+      "val_accuracy": 0.8696573056821125,
+      "val_precision": 0.3486147757255937,
+      "val_recall": 0.5467241379310345,
+      "val_f1": 0.4257518796992481,
+      "val_predicted_positive_rate": 0.13860149024029744,
+      "test_predicted_positive_rate": 0.13940518746742978,
+      "refit_and_predict_time_s": 138.7,
+      "info": {
+        "n_nonzero_weights": 330
+      },
+      "all_configurations": [
+        {
+          "params": {},
+          "threshold": 0.195,
+          "accuracy": 0.8696573056821125,
+          "precision": 0.3486147757255937,
+          "recall": 0.5467241379310345,
+          "f1": 0.4257518796992481
+        }
+      ],
+      "submission_file": "results\\submission_logreg.csv"
+    },
+    {
+      "model": "l2",
+      "label": "L2 logistic regr.",
+      "best_params": {
+        "lambda": 0.001
+      },
+      "threshold": 0.19999999999999996,
+      "val_accuracy": 0.8725219802825057,
+      "val_precision": 0.35390571623775907,
+      "val_recall": 0.5358620689655172,
+      "val_f1": 0.42627897407762994,
+      "val_predicted_positive_rate": 0.13381687415240678,
+      "test_predicted_positive_rate": 0.1347790709368343,
+      "refit_and_predict_time_s": 165.4,
+      "info": {
+        "n_nonzero_weights": 330
+      },
+      "all_configurations": [
+        {
+          "params": {
+            "lambda": 0.0001
+          },
+          "threshold": 0.195,
+          "accuracy": 0.8696573056821125,
+          "precision": 0.348448162007484,
+          "recall": 0.5458620689655173,
+          "f1": 0.4253661158135161
+        },
+        {
+          "params": {
+            "lambda": 0.001
+          },
+          "threshold": 0.19999999999999996,
+          "accuracy": 0.8725219802825057,
+          "precision": 0.35390571623775907,
+          "recall": 0.5358620689655172,
+          "f1": 0.42627897407762994
+        },
+        {
+          "params": {
+            "lambda": 0.01
+          },
+          "threshold": 0.19999999999999996,
+          "accuracy": 0.8709829795663371,
+          "precision": 0.34927093930145814,
+          "recall": 0.5327586206896552,
+          "f1": 0.42192940533897727
+        }
+      ],
+      "submission_file": "results\\submission_l2.csv"
+    },
+    {
+      "model": "l1",
+      "label": "L1 logistic regr.",
+      "best_params": {
+        "lambda": 0.0001
+      },
+      "threshold": 0.19999999999999996,
+      "val_accuracy": 0.8723238910814146,
+      "val_precision": 0.3534159372513357,
+      "val_recall": 0.5360344827586206,
+      "val_f1": 0.425977940672741,
+      "val_predicted_positive_rate": 0.1340454386152041,
+      "test_predicted_positive_rate": 0.13484306859634848,
+      "refit_and_predict_time_s": 114.8,
+      "info": {
+        "n_nonzero_weights": 239,
+        "n_weights": 330
+      },
+      "all_configurations": [
+        {
+          "params": {
+            "lambda": 1e-05
+          },
+          "threshold": 0.20499999999999996,
+          "accuracy": 0.8744723970317095,
+          "precision": 0.35732677902621723,
+          "recall": 0.5263793103448275,
+          "f1": 0.42568321249302843
+        },
+        {
+          "params": {
+            "lambda": 0.0001
+          },
+          "threshold": 0.19999999999999996,
+          "accuracy": 0.8723238910814146,
+          "precision": 0.3534159372513357,
+          "recall": 0.5360344827586206,
+          "f1": 0.425977940672741
+        },
+        {
+          "params": {
+            "lambda": 0.001
+          },
+          "threshold": 0.19999999999999996,
+          "accuracy": 0.8726591189601841,
+          "precision": 0.353701796544227,
+          "recall": 0.5329310344827586,
+          "f1": 0.42520118302496734
+        }
+      ],
+      "submission_file": "results\\submission_l1.csv"
+    },
+    {
+      "model": "knn",
+      "label": "k-NN",
+      "best_params": {
+        "k": 101
+      },
+      "threshold": 0.13999999999999999,
+      "val_accuracy": 0.8592652414402608,
+      "val_precision": 0.30838724068703993,
+      "val_recall": 0.47672413793103446,
+      "val_f1": 0.37450900717865365,
+      "val_predicted_positive_rate": 0.1366205982293873,
+      "test_predicted_positive_rate": 0.13348997522376324,
+      "refit_and_predict_time_s": 181.4,
+      "info": {
+        "n_reference_points": 50000
+      },
+      "all_configurations": [
+        {
+          "params": {
+            "k": 15
+          },
+          "threshold": 0.135,
+          "accuracy": 0.849452207170829,
+          "precision": 0.2771466025781079,
+          "recall": 0.4374137931034483,
+          "f1": 0.3393072087735723
+        },
+        {
+          "params": {
+            "k": 51
+          },
+          "threshold": 0.13999999999999999,
+          "accuracy": 0.8541301598427476,
+          "precision": 0.2975206611570248,
+          "recall": 0.47793103448275864,
+          "f1": 0.36673943242706886
+        },
+        {
+          "params": {
+            "k": 101
+          },
+          "threshold": 0.13999999999999999,
+          "accuracy": 0.8592652414402608,
+          "precision": 0.30838724068703993,
+          "recall": 0.47672413793103446,
+          "f1": 0.37450900717865365
+        }
+      ],
+      "submission_file": "results\\submission_knn.csv"
+    },
+    {
+      "model": "gnb",
+      "label": "Gaussian Naive Bayes",
+      "best_params": {
+        "var_smoothing": 0.001
+      },
+      "threshold": 0.945,
+      "val_accuracy": 0.7329605192984595,
+      "val_precision": 0.2099351838107961,
+      "val_recall": 0.731551724137931,
+      "val_f1": 0.3262465879820076,
+      "val_predicted_positive_rate": 0.3079677571731147,
+      "test_predicted_positive_rate": 0.31313140548002816,
+      "refit_and_predict_time_s": 3.5,
+      "info": {},
+      "all_configurations": [
+        {
+          "params": {
+            "var_smoothing": 1e-09
+          },
+          "threshold": 0.95,
+          "accuracy": 0.7327624300973684,
+          "precision": 0.2096566735925596,
+          "recall": 0.7306896551724138,
+          "f1": 0.32582455600830323
+        },
+        {
+          "params": {
+            "var_smoothing": 1e-06
+          },
+          "threshold": 0.95,
+          "accuracy": 0.7327624300973684,
+          "precision": 0.2096566735925596,
+          "recall": 0.7306896551724138,
+          "f1": 0.32582455600830323
+        },
+        {
+          "params": {
+            "var_smoothing": 0.001
+          },
+          "threshold": 0.945,
+          "accuracy": 0.7329605192984595,
+          "precision": 0.2099351838107961,
+          "recall": 0.731551724137931,
+          "f1": 0.3262465879820076
+        }
+      ],
+      "submission_file": "results\\submission_gnb.csv"
+    }
+  ]
+}
