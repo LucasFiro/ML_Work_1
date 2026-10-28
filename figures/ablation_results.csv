@@ -1,0 +1,10 @@
+experiment,f1,accuracy,threshold
+always negative,0.000000,0.911622,nan
+gaussian naive bayes,0.318498,0.713472,nan
+least squares,nan,nan,nan
+ridge (lambda=1e-6),0.420312,0.858061,0.205620
+logistic regression,0.425957,0.869520,0.194577
+final: L2 logistic (lambda=1e-3),0.426241,0.872461,0.199920
+final, threshold 0.5,0.234189,0.915492,0.500000
+final without code cleaning,0.414864,0.858199,0.183193
+final without missing flags,0.423906,0.873391,0.209848

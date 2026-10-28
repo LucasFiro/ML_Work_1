@@ -14,6 +14,7 @@ Usage (from the repository root):
     python compare_models.py                 # all models
     python compare_models.py l2 knn          # only some models
 """
+
 import csv
 import json
 import os
@@ -115,7 +116,6 @@ def fit_l1(y, tx, params):
     return lambda x: imp.sigmoid(x @ w), {"n_nonzero_weights": int(np.sum(w != 0))}
 
 
-
 def fit_knn(y, tx, params):
     """k-NN: score = fraction of positives among the k nearest neighbours.
 
@@ -129,17 +129,17 @@ def fit_knn(y, tx, params):
         idx = np.random.RandomState(SEED).choice(len(y), KNN_MAX_TRAIN, replace=False)
     ref = tx[idx][:, keep].astype(np.float32)
     ref_y = y[idx].astype(np.float32)
-    ref_sq = (ref ** 2).sum(axis=1)
+    ref_sq = (ref**2).sum(axis=1)
 
     def score_fn(x):
         x = x[:, keep].astype(np.float32)
         out = np.empty(len(x))
         for s in range(0, len(x), KNN_CHUNK):
-            q = x[s:s + KNN_CHUNK]
+            q = x[s : s + KNN_CHUNK]
             # squared distance up to a per-query constant (irrelevant for ranking)
             d2 = ref_sq[None, :] - 2.0 * (q @ ref.T)
             nn = np.argpartition(d2, k, axis=1)[:, :k]
-            out[s:s + KNN_CHUNK] = ref_y[nn].mean(axis=1)
+            out[s : s + KNN_CHUNK] = ref_y[nn].mean(axis=1)
         return out
 
     return score_fn, {"n_reference_points": int(len(idx))}
@@ -221,12 +221,19 @@ def run_model(name, data):
         scores = score_fn(data["va_x"])
         thr, m, curve = sweep_threshold(data["va_y"], scores)
         dt = time.time() - t0
-        print(f"  params={params}  thr={thr:.3f}  F1={m['f1']:.4f}  "
-              f"acc={m['accuracy']:.4f}  ({dt:.0f}s)")
+        print(
+            f"  params={params}  thr={thr:.3f}  F1={m['f1']:.4f}  "
+            f"acc={m['accuracy']:.4f}  ({dt:.0f}s)"
+        )
         tried.append({"params": params, "threshold": thr, **m})
         if best is None or m["f1"] > best["metrics"]["f1"]:
-            best = {"params": params, "threshold": thr, "metrics": m, "curve": curve,
-                    "val_pos_rate": float(np.mean(scores >= thr))}
+            best = {
+                "params": params,
+                "threshold": thr,
+                "metrics": m,
+                "curve": curve,
+                "val_pos_rate": float(np.mean(scores >= thr)),
+            }
 
     # 3. Refit on all training data and predict the test set
     t0 = time.time()
@@ -239,11 +246,17 @@ def run_model(name, data):
     os.makedirs(OUT_DIR, exist_ok=True)
     sub_path = os.path.join(OUT_DIR, f"submission_{name}.csv")
     create_csv_submission(data["test_ids"], y_pred, sub_path)
-    np.savetxt(os.path.join(OUT_DIR, f"f1_curve_{name}.csv"),
-               np.column_stack([THRESHOLDS, best["curve"]]),
-               delimiter=",", header="threshold,val_f1", comments="")
-    print(f"  -> best params {best['params']}, threshold {best['threshold']:.3f}, "
-          f"val F1 {best['metrics']['f1']:.4f}; written {sub_path}")
+    np.savetxt(
+        os.path.join(OUT_DIR, f"f1_curve_{name}.csv"),
+        np.column_stack([THRESHOLDS, best["curve"]]),
+        delimiter=",",
+        header="threshold,val_f1",
+        comments="",
+    )
+    print(
+        f"  -> best params {best['params']}, threshold {best['threshold']:.3f}, "
+        f"val F1 {best['metrics']['f1']:.4f}; written {sub_path}"
+    )
 
     return {
         "model": name,
@@ -281,21 +294,35 @@ def main():
     # Same train/validation split for every model
     tr_x, tr_y, va_x, va_y = train_val_split(tx_train, y_train, VAL_RATIO, SEED)
     data = {
-        "tx_train": tx_train, "y_train": y_train, "tx_test": tx_test,
-        "test_ids": test_ids, "tr_x": tr_x, "tr_y": tr_y, "va_x": va_x, "va_y": va_y,
+        "tx_train": tx_train,
+        "y_train": y_train,
+        "tx_test": tx_test,
+        "test_ids": test_ids,
+        "tr_x": tr_x,
+        "tr_y": tr_y,
+        "va_x": va_x,
+        "va_y": va_y,
     }
 
     results = [run_model(n, data) for n in names]
 
     # Global setup (to report in the paper)
     setup = {
-        "seed": SEED, "val_ratio": VAL_RATIO, "clean_special_codes": CLEAN_CODES,
+        "seed": SEED,
+        "val_ratio": VAL_RATIO,
+        "clean_special_codes": CLEAN_CODES,
         "tune_hyperparams": TUNE_HYPERPARAMS,
-        "threshold_grid": [float(THRESHOLDS[0]), float(THRESHOLDS[-1]),
-                           float(THRESHOLDS[1] - THRESHOLDS[0])],
-        "gamma": GAMMA, "max_iters": MAX_ITERS, "knn_max_train": KNN_MAX_TRAIN,
+        "threshold_grid": [
+            float(THRESHOLDS[0]),
+            float(THRESHOLDS[-1]),
+            float(THRESHOLDS[1] - THRESHOLDS[0]),
+        ],
+        "gamma": GAMMA,
+        "max_iters": MAX_ITERS,
+        "knn_max_train": KNN_MAX_TRAIN,
         "n_features_after_preprocessing": int(tx_train.shape[1]),
-        "n_train_total": int(len(y_train)), "n_train_split": int(len(tr_y)),
+        "n_train_total": int(len(y_train)),
+        "n_train_split": int(len(tr_y)),
         "n_validation": int(len(va_y)),
         "positive_rate_train": float(np.mean(y_train == 1)),
         "positive_rate_validation": float(np.mean(va_y == 1)),
@@ -303,27 +330,41 @@ def main():
     with open(os.path.join(OUT_DIR, "results.json"), "w") as f:
         json.dump({"setup": setup, "results": results}, f, indent=2)
 
-    cols = ["model", "best_params", "threshold", "val_f1", "val_accuracy",
-            "val_precision", "val_recall", "test_predicted_positive_rate"]
+    cols = [
+        "model",
+        "best_params",
+        "threshold",
+        "val_f1",
+        "val_accuracy",
+        "val_precision",
+        "val_recall",
+        "test_predicted_positive_rate",
+    ]
     with open(os.path.join(OUT_DIR, "summary.csv"), "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(cols)
         for r in results:
-            writer.writerow([json.dumps(r[c]) if c == "best_params" else r[c]
-                             for c in cols])
+            writer.writerow(
+                [json.dumps(r[c]) if c == "best_params" else r[c] for c in cols]
+            )
 
     # Rows for the LaTeX results table
-    rows = [f"{r['label']} & z-score & {r['threshold']:.3f} & "
-            f"{r['val_f1']:.3f} & {r['val_accuracy']:.3f} \\\\" for r in results]
+    rows = [
+        f"{r['label']} & z-score & {r['threshold']:.3f} & "
+        f"{r['val_f1']:.3f} & {r['val_accuracy']:.3f} \\\\"
+        for r in results
+    ]
     with open(os.path.join(OUT_DIR, "table_rows.tex"), "w") as f:
         f.write("\n".join(rows) + "\n")
 
     print("\n=== Summary (validation) ===")
     print(f"{'model':<26}{'thr':>7}{'F1':>8}{'acc':>8}{'prec':>8}{'rec':>8}  params")
     for r in results:
-        print(f"{r['label']:<26}{r['threshold']:>7.3f}{r['val_f1']:>8.4f}"
-              f"{r['val_accuracy']:>8.4f}{r['val_precision']:>8.4f}"
-              f"{r['val_recall']:>8.4f}  {r['best_params']}")
+        print(
+            f"{r['label']:<26}{r['threshold']:>7.3f}{r['val_f1']:>8.4f}"
+            f"{r['val_accuracy']:>8.4f}{r['val_precision']:>8.4f}"
+            f"{r['val_recall']:>8.4f}  {r['best_params']}"
+        )
     print(f"\nAll outputs are in {OUT_DIR}")
     print("LaTeX rows:\n" + "\n".join(rows))
 
