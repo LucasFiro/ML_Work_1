@@ -58,7 +58,7 @@ def main():
     )
     results = {}
 
-    # ---- Model comparison (cleaned features + missing flags) ----
+    # Model comparison (cleaned features + missing flags)
     tr_x, tr_y, va_x, va_y = prepare(x, x_test, y, names)
     results["always negative"] = (0.0, 1 - va_y.mean(), np.nan)
 
@@ -95,7 +95,7 @@ def main():
     )
     final_threshold = results["final: L2 logistic (lambda=1e-3)"][2]
 
-    # ---- Ablation: remove one component at a time ----
+    # Ablation: remove one component at a time
     tr_x, tr_y, va_x, va_y_nc = prepare(x, x_test, y, names, clean=False)
     w = logistic(tr_y, tr_x)
     results["final without code cleaning"] = evaluate(va_y_nc, imp.sigmoid(va_x @ w))
@@ -114,7 +114,7 @@ def main():
         for name, (f1, acc, thr) in results.items():
             f.write(f"{name},{f1:.6f},{acc:.6f},{thr:.6f}\n")
 
-    # ---- Report figure ----
+    # Report figure
     cv_path = os.path.join(FIG_DIR, "cv_results.csv")
     if os.path.exists(cv_path):
         cv = np.loadtxt(cv_path, delimiter=",", skiprows=1, ndmin=2)

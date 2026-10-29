@@ -11,8 +11,8 @@ regularized logistic regression, k-NN, Gaussian Naive Bayes) this script:
      results/table_rows.tex (rows ready to paste in the LaTeX table).
 
 Usage (from the repository root):
-    python compare_models.py                 # all models
-    python compare_models.py l2 knn          # only some models
+    python compare_models.py # all models
+    python compare_models.py l2 knn # only some models
 """
 
 import csv
@@ -33,9 +33,7 @@ from helpers import create_csv_submission
 from load_data import load_data
 from tools import train_val_split
 
-# ----------------------------------------------------------------------------
 # Global settings (all of them should be reported in the paper)
-# ----------------------------------------------------------------------------
 SEED = 0  # seed of the train/validation split
 VAL_RATIO = 0.2  # fraction of the training data kept for validation
 CLEAN_CODES = True  # replace BRFSS "don't know / refused / none" codes
@@ -51,9 +49,7 @@ KNN_CHUNK = 256  # number of queries processed at once by k-NN
 OUT_DIR = os.path.join(ROOT, "results")
 
 
-# ----------------------------------------------------------------------------
 # Metrics and threshold selection
-# ----------------------------------------------------------------------------
 def sigmoid(z):
     """Numerically stable sigmoid."""
     return 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
@@ -85,10 +81,8 @@ def sweep_threshold(y, scores):
     return thr, metrics(y, (scores >= thr).astype(float)), f1_curve
 
 
-# ----------------------------------------------------------------------------
 # Models. Each fit function takes (y, tx, params) and returns
 # (score_fn, info) where score_fn(x) gives a score in [0, 1] for each row of x.
-# ----------------------------------------------------------------------------
 def fit_logreg(y, tx, params):
     """Logistic regression without regularization, starting from w = 0."""
     w, _ = imp.logistic_regression(y, tx, np.zeros(tx.shape[1]), MAX_ITERS, GAMMA)
@@ -204,9 +198,7 @@ MODELS = {
 }
 
 
-# ----------------------------------------------------------------------------
 # Experiment for one model
-# ----------------------------------------------------------------------------
 def run_model(name, data):
     """Tune, choose the threshold, refit on all data, write the submission."""
     spec = MODELS[name]
@@ -273,9 +265,7 @@ def run_model(name, data):
     }
 
 
-# ----------------------------------------------------------------------------
 # Main
-# ----------------------------------------------------------------------------
 def main():
     names = sys.argv[1:] or list(MODELS)
     unknown = [n for n in names if n not in MODELS]

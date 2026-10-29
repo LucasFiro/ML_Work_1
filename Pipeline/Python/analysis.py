@@ -4,7 +4,7 @@ import numpy as np
 ADMIN_COLS = ["SEQNO", "_PSU", "IDATE", "IMONTH", "IDAY", "IYEAR", "FMONTH", "DISPCODE"]
 
 
-# -------------- Data exploration --------------
+# Data exploration
 def missing_ratio(x):
     """
     Description: Calculate the ratio of missing values (NaN) for each column in the input array.
@@ -57,7 +57,7 @@ def target_correlation(x, y):
     return corr
 
 
-# -------------- Data cleaning --------------
+# Data cleaning
 def clean_special_codes(x_train, x_test):
     """
     Replace the BRFSS special answer codes by meaningful values.
@@ -87,7 +87,7 @@ def clean_special_codes(x_train, x_test):
     return x_train, x_test
 
 
-# # -------------- Feature extraction --------------
+# Feature extraction
 def select_features(x_train, names, max_missing=0.8):
     """
     Description: Select features based on certain criteria.
