@@ -162,41 +162,34 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
 
 def logistic_regression_l1(y, tx, initial_w, max_iters, gamma, lambda_):
     """
-    Logistic regression with L1 regularization using gradient descent.
+    L1-regularized logistic regression by proximal gradient descent (ISTA).
+
+    Minimizes the mean logistic loss + lambda_ * ||w||_1. Each iteration takes a
+    gradient step on the logistic loss, then applies soft-thresholding, which sets
+    small weights exactly to zero. Constant columns (e.g. the bias) are not penalized.
 
     Args:
-        y: labels (N,)
-        tx: features matrix (N, D)
-        initial_w: initial weights (D,)
+        y: labels in {0, 1}, shape (N,)
+        tx: features matrix, shape (N, D)
+        initial_w: initial weights, shape (D,)
         max_iters: number of iterations
-        gamma: learning rate
+        gamma: step size
         lambda_: L1 regularization strength
 
     Returns:
-        loss: final regularized loss
-        w: learned weights
+        (w, loss): last weight vector and its logistic loss (without the penalty term).
     """
-    w = initial_w
-    N = y.shape[0]
-
+    w = initial_w.copy()
+    penalized = tx.std(axis=0) > 0  # do not shrink the bias / constant columns
     for _ in range(max_iters):
-        pred = sigmoid(tx.dot(w))
-
-        # Gradient of logistic loss
-        grad = tx.T.dot(pred - y) / N
-
-        # Subgradient of L1 penalty
-        grad += lambda_ * np.sign(w)
-
-        w -= gamma * grad
-
-    # Logistic loss + L1 penalty
-    eps = 1e-15
-    pred = np.clip(sigmoid(tx.dot(w)), eps, 1 - eps)
-
+        # Gradient step on the logistic loss
+        grad = tx.T.dot(sigmoid(tx.dot(w)) - y) / y.shape[0]
+        w = w - gamma * grad
+        # Proximal step of the L1 penalty: soft-thresholding
+        shrunk = np.sign(w) * np.maximum(np.abs(w) - gamma * lambda_, 0.0)
+        w = np.where(penalized, shrunk, w)
     loss = calculate_loss(y, tx, w)
-    # loss += lambda_ * np.sum(np.abs(w))
-    return loss, w
+    return w, loss
 
 
 def knn_train(y, tx):

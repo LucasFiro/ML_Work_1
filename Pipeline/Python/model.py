@@ -63,7 +63,7 @@ def compare_models(
     ).astype(int)
 
     # 3. Logistic Regression L1
-    loss_l1, w_l1 = imp.logistic_regression_l1(
+    w_l1, loss_l1 = imp.logistic_regression_l1(
         y_train, tx_train, initial_w.copy(), max_iters, gamma, lambda_l1
     )
     predictions["Logistic Regression L1"] = (
