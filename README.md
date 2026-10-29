@@ -1,9 +1,8 @@
-# First ML lab
+# Project 1
 
-![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Python](https://img.shields.io/badge/Python-3.9-blue)
 
-This repository contains the code for ...
-
+This repository contains the code for Project 1 of the EPFL Machine Learning course (CS-433): predicting coronary heart disease (MICHD) from the BRFSS 2015 health survey with machine learning methods implemented from scratch in NumPy, including data cleaning, an L2-regularized logistic regression with an F1-optimized decision threshold, and the comparison, cross-validation and ablation experiments reported in our paper.
 ---
 
 ## Installation
@@ -26,21 +25,28 @@ Optional: verify that required versions are installed
 ---
 
 ## Repository Structure
-- `Data/`: Folder for data storage (data needs to be downloaded locally and is ignored by git
-    - `temp`: File present just to create Data folder, useless
-- `Pipeline/`: Code for the training and analysis pipeline
-  - `Jupyter/`
-    - `Temp_Notebook.ipynb` : Notebook to try things
-  - `Python/`
-    - `analysis.py`: Metrics computation
-    - `load_data.py`: Data loading
-    - `main.py`: Script to run the full pipeline
-    - `model.py`: ML model for predictions
-    - `plotting.py`: Plot generation
-    - `tools.py`: Additional helper
-- `.gitignore`: Used to record which folder and file ignore
-- `README.md`: README file
-- `requirements.txt`: Requirements to run the code in this repository
+- `implementations.py` — the 6 required methods (GD/SGD on MSE, least squares, ridge,
+  logistic and regularized logistic regression) and additional models (L1 logistic
+  regression, KNN, Gaussian naive Bayes)
+- `run.py` — end-to-end script producing our best submission
+- `compare.py` — model comparison (hyperparameter grid and F1-optimal threshold for
+  each model on the same split); writes `results/summary.csv`, `results/results.json`,
+  the F1-vs-threshold curves and one submission file per model
+- `helpers.py` — course helper (`create_csv_submission`)
+- `Pipeline/Python/`
+  - `load_data.py` — CSV loading with a `.npz` cache, labels converted to {0, 1}
+  - `analysis.py` — exploratory statistics, special-code cleaning and preprocessing
+  - `tools.py` — train/validation split, ridge solver, metrics, threshold search
+  - `model.py` — comparison of several models on the same split
+  - `cross_validation.py` — k-fold cross-validation of λ
+  - `ablation.py` — ablation study and baselines reported in the paper
+  - `plotting.py`, `main.py` — figures and exploratory pipeline
+- `results/` — outputs of `compare.py`
+- `figures/` — cross-validation and ablation results, figure of the report
+- `Pipeline/Jupyter/` — scratch notebook
+- `Data/` — local data folder (not versioned)
+- `requirements.txt` — Python dependencies (`numpy`, `matplotlib` for plots only)
+- `.gitignore` — files and folders not versioned (dataset, cache, virtual environment)
 
 ---
 
@@ -61,7 +67,7 @@ heart attack (MICHD)** from health and lifestyle features.
 
 
 ## Usage:
-> ⚠️ **Note**: Be careful with compatibility issue of data.
+> **Note**: Be careful with compatibility issue of data.
 Run Python scripts with argument parsing. 
 
 ### Arguments for `main.py`:
